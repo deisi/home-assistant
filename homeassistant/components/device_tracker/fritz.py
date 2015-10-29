@@ -1,4 +1,37 @@
-""" Supports scanning a FritzBox router"""
+"""
+homeassistant.components.device_tracker.fritz
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Device tracker platform that supports scanning a FitzBox router for device
+presence.
+
+Configuration:
+
+To use the fritz tracker you have to adapt your configuration.yaml by
+using the following template:
+
+device_tracker:
+  platform: fritz
+  host: YOUR_ROUTER_IP
+  username: YOUR_ADMIN_USERNAME
+  password: YOUR_ADMIN_PASSWORD
+
+host
+*Optional
+The IP address of your router, e.g. 192.168.0.1.
+It is optional since every fritzbox is also reachable by using the 169.254.1.1 IP.
+
+username
+*Optional
+The username of an user with administrative privileges, usually 'admin'.
+However, it seems that it is not necessary to use it in current generation fritzbox routers
+because the necessary data can be retrieved anonymously.
+
+password
+*Optional
+The password for your given admin account.
+However, it seems that it is not necessary to use it in current generation fritzbox routers
+because the necessary data can be retrieved anonymously.
+"""
 import logging
 from datetime import timedelta
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
