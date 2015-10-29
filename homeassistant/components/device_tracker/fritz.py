@@ -14,6 +14,7 @@ _LOGGER = logging.getLogger(__name__)
 
 REQUIREMENTS = ['fritzconnection==0.4.6']
 
+
 def get_scanner(hass, config):
     """ Validates config and returns FritzBoxScanner obj"""
     if not validate_config(config,
@@ -25,26 +26,27 @@ def get_scanner(hass, config):
 
 
 # pylint: disable=too-many-instance-attributes
-class FritzBoxScanner():
-    """ This class queries a FritzBox router. Adapted from luci.py and
-    using fritzconnection as comunication backend with the router
+class FritzBoxScanner(object):
+    """ This class queries a FritzBox router. It is using the
+    fritzconnection library for communication with the router.
 
-    The API describtion can be found under:
+    The API description can be found under:
     https://pypi.python.org/pypi/fritzconnection/0.4.6
 
-    This scanner asks the fritzbox for its known hosts and returns
-    theis state (on, or off)
+    This scanner retrieves the list of known hosts and checks
+    their corresponding states (on, or off).
 
-    Due to a bug in the fritzbox api (router side), not more than
-    16 hosts are returned."""
+    Due to a bug of the fritzbox api (router side) it is not possible
+    to track more than 16 hosts."""
     def __init__(self, config):
         self.last_results = []
 
         try:
+            # noinspection PyPackageRequirements,PyUnresolvedReferences
             import fritzconnection as fc
         except ImportError:
-            # pylint: disable=line-too-long
-            _LOGGER.exception('Failed to import fritzconnection. Did you install fritzconnection with the bugfix from "https://bitbucket.org/Fettlaus/fritzconnection"') # flake8: noqa
+            _LOGGER.exception("""Failed to import Python library fritzconnection.
+                              Please run <home-assistant>/scripts/setup to install it.""")
             self.success_init = False
             return
 
@@ -55,7 +57,7 @@ class FritzBoxScanner():
         if CONF_PASSWORD in config.keys():
             password = config[CONF_PASSWORD]
         self._fritz_box = fc.FritzHosts(address=host, password=password)
-        # I have not found a way to validate login, atleast for
+        # I have not found a way to validate login, at least for
         # my fritzbox, i can get the list of known hosts even without
         # password
         self.success_init = True
