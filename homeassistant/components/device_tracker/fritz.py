@@ -137,10 +137,13 @@ class FritzBoxScanner(object):
 
     @Throttle(MIN_TIME_BETWEEN_SCANS)
     def _update_info(self):
-        """ Retrieves latest information from the FritzBox.
-            Returns boolean if scanning successful. """
+        """
+        Retrieves latest information from the FritzBox.
+        Returns boolean if scanning successful.
+        """
         if not self.success_init:
-            return
+            return False
 
         _LOGGER.info("Scanning")
         self.last_results = self.fritz_box.get_hosts_info()
+        return True
