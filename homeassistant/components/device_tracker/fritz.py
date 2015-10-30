@@ -63,7 +63,8 @@ def get_scanner(hass, config):
 
 # pylint: disable=too-many-instance-attributes
 class FritzBoxScanner(object):
-    """ This class queries a FritzBox router. It is using the
+    """
+    This class queries a FritzBox router. It is using the
     fritzconnection library for communication with the router.
 
     The API description can be found under:
@@ -73,7 +74,8 @@ class FritzBoxScanner(object):
     their corresponding states (on, or off).
 
     Due to a bug of the fritzbox api (router side) it is not possible
-    to track more than 16 hosts."""
+    to track more than 16 hosts.
+    """
     def __init__(self, config):
         self.last_results = []
         self.host = '169.254.1.1'  # This IP is valid for all fritzboxes
@@ -118,8 +120,7 @@ class FritzBoxScanner(object):
             _LOGGER.error("Failed to establish connection to FritzBox with IP: {0}".format(self.host))
 
     def scan_devices(self):
-        """ Scans for new devices and return a
-            list containing found device ids. """
+        """ Scan for new devices and return a list of found device ids. """
         self._update_info()
         active_hosts = []
         for known_host in self.last_results:
@@ -128,8 +129,7 @@ class FritzBoxScanner(object):
         return active_hosts
 
     def get_device_name(self, mac):
-        """ Returns the name of the given device or None if not known. """
-
+        """ Returns the name of the given device or None if is not known. """
         ret = self.fritz_box.get_specific_host_entry(mac)["NewHostName"]
         if ret == {}:
             return None
