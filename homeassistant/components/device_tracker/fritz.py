@@ -48,7 +48,7 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=5)
 
 _LOGGER = logging.getLogger(__name__)
 
-REQUIREMENTS = ['fritzconnection==0.4.6']
+#REQUIREMENTS = ['https://github.com/deisi/fritzconnection/archive/b5c14515e1c8e2652b06b6316a7f3913df942841.zip#fritzconnection==0.4.6']
 
 
 def get_scanner(hass, config):
