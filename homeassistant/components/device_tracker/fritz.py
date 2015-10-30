@@ -76,7 +76,10 @@ class FritzBoxScanner(object):
     to track more than 16 hosts."""
     def __init__(self, config):
         self.last_results = []
+        self.host = '169.254.1.1'  # This IP is valid for all fritzboxes
+        self.password = ''
 
+        # Try to import the fritzconnection library
         try:
             # noinspection PyPackageRequirements,PyUnresolvedReferences
             import fritzconnection as fc
@@ -86,22 +89,30 @@ class FritzBoxScanner(object):
             self.success_init = False
             return
 
-        host = '169.254.1.1'  # this is valid for all fritzboxes
+        # Check for user specific configuration
         if CONF_HOST in config.keys():
-            host = config[CONF_HOST]
-        password = ''
+            self.host = config[CONF_HOST]
         if CONF_PASSWORD in config.keys():
-            password = config[CONF_PASSWORD]
-        self._fritz_box = fc.FritzHosts(address=host, password=password)
-        # I have not found a way to validate login, at least for
-        # my fritzbox, i can get the list of known hosts even without
-        # password
-        self.success_init = True
+            self.password = config[CONF_PASSWORD]
+
+        # Establish a connection to the fritzbox
+        try:
+            self.fritz_box = fc.FritzHosts(address=self.host, password=self.password)
+        except Exception:
+            self.fritz_box = None
+
+        # At this point it is difficult to tell if a connection is established.
+        # So just check for null objects ...
+        if self.fritz_box is None or not self.fritz_box.modelname:
+            self.success_init = False
+        else:
+            self.success_init = True
 
         if self.success_init:
+            _LOGGER.info("Successfully connected to {0}".format(self.fritz_box.modelname))
             self._update_info()
         else:
-            _LOGGER.error("Failed to login into FritzBox")
+            _LOGGER.error("Failed to establish connection to FritzBox with IP: {0}".format(self.host))
 
     def scan_devices(self):
         """ Scans for new devices and return a
@@ -116,7 +127,7 @@ class FritzBoxScanner(object):
     def get_device_name(self, mac):
         """ Returns the name of the given device or None if not known. """
 
-        ret = self._fritz_box.get_specific_host_entry(mac)["NewHostName"]
+        ret = self.fritz_box.get_specific_host_entry(mac)["NewHostName"]
         if ret == {}:
             return None
         return ret
@@ -129,4 +140,4 @@ class FritzBoxScanner(object):
             return
 
         _LOGGER.info("Scanning")
-        self.last_results = self._fritz_box.get_hosts_info()
+        self.last_results = self.fritz_box.get_hosts_info()
