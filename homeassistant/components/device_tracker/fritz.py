@@ -51,6 +51,7 @@ _LOGGER = logging.getLogger(__name__)
 #REQUIREMENTS = ['https://github.com/deisi/fritzconnection/archive/b5c14515e1c8e2652b06b6316a7f3913df942841.zip#fritzconnection==0.4.6']
 
 
+# noinspection PyUnusedLocal
 def get_scanner(hass, config):
     """ Validates config and returns FritzBoxScanner"""
     if not validate_config(config,
@@ -88,7 +89,7 @@ class FritzBoxScanner(object):
             import fritzconnection as fc
         except ImportError:
             _LOGGER.exception("""Failed to import Python library fritzconnection.
-                              Please run <home-assistant>/scripts/setup to install it.""")
+                              Please run <home-assistant>/setup to install it.""")
             self.success_init = False
             return
 
