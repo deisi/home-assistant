@@ -77,6 +77,7 @@ class FritzBoxScanner(object):
     def __init__(self, config):
         self.last_results = []
         self.host = '169.254.1.1'  # This IP is valid for all fritzboxes
+        self.username = 'admin'
         self.password = ''
 
         # Try to import the fritzconnection library
@@ -92,12 +93,14 @@ class FritzBoxScanner(object):
         # Check for user specific configuration
         if CONF_HOST in config.keys():
             self.host = config[CONF_HOST]
+        if CONF_USERNAME in config.keys():
+            self.username = config[CONF_USERNAME]
         if CONF_PASSWORD in config.keys():
             self.password = config[CONF_PASSWORD]
 
         # Establish a connection to the fritzbox
         try:
-            self.fritz_box = fc.FritzHosts(address=self.host, password=self.password)
+            self.fritz_box = fc.FritzHosts(address=self.host, user=self.username, password=self.password)
         except Exception:
             self.fritz_box = None
 
