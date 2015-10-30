@@ -1,14 +1,16 @@
 """
 homeassistant.components.script
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
+entity_id
 Scripts are a sequence of actions that can be triggered manually
 by the user or automatically based upon automation events, etc.
 """
 import logging
-from datetime import datetime, timedelta
+from datetime import timedelta
+import homeassistant.util.dt as date_util
 import threading
 
+from homeassistant.helpers.event import track_point_in_time
 from homeassistant.util import split_entity_id
 from homeassistant.const import (
     STATE_ON, STATE_OFF, SERVICE_TURN_ON, SERVICE_TURN_OFF, EVENT_TIME_CHANGED)
@@ -20,7 +22,10 @@ CONF_ALIAS = "alias"
 CONF_SERVICE = "execute_service"
 CONF_SERVICE_DATA = "service_data"
 CONF_SEQUENCE = "sequence"
+CONF_EVENT = "event"
+CONF_EVENT_DATA = "event_data"
 CONF_DELAY = "delay"
+ATTR_ENTITY_ID = "entity_id"
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -39,15 +44,22 @@ def setup(hass, config):
         hass.services.register(DOMAIN, name, script)
         scripts.append(script)
 
+    def _get_entities(service):
+        """  Make sure that we always get a list of entities """
+        if isinstance(service.data[ATTR_ENTITY_ID], list):
+            return service.data[ATTR_ENTITY_ID]
+        else:
+            return [service.data[ATTR_ENTITY_ID]]
+
     def turn_on(service):
         """ Calls a script. """
-        for entity_id in service.data['entity_id']:
+        for entity_id in _get_entities(service):
             domain, service = split_entity_id(entity_id)
             hass.services.call(domain, service, {})
 
     def turn_off(service):
         """ Cancels a script. """
-        for entity_id in service.data['entity_id']:
+        for entity_id in _get_entities(service):
             for script in scripts:
                 if script.entity_id == entity_id:
                     script.cancel()
@@ -107,11 +119,13 @@ class Script(object):
         for action in self.actions:
             if CONF_SERVICE in action:
                 self._call_service(action)
+            elif CONF_EVENT in action:
+                self._fire_event(action)
             elif CONF_DELAY in action:
                 delay = timedelta(**action[CONF_DELAY])
-                point_in_time = datetime.now() + delay
-                self.listener = self.hass.track_point_in_time(
-                    self, point_in_time)
+                point_in_time = date_util.now() + delay
+                self.listener = track_point_in_time(
+                    self.hass, self, point_in_time)
                 return False
         return True
 
@@ -138,3 +152,10 @@ class Script(object):
         domain, service = split_entity_id(action[CONF_SERVICE])
         data = action.get(CONF_SERVICE_DATA, {})
         self.hass.services.call(domain, service, data)
+
+    def _fire_event(self, action):
+        """ Fires an event. """
+        self.last_action = action.get(CONF_ALIAS, action[CONF_EVENT])
+        _LOGGER.info("Executing script %s step %s", self.alias,
+                     self.last_action)
+        self.hass.bus.fire(action[CONF_EVENT], action.get(CONF_EVENT_DATA))
