@@ -1,6 +1,9 @@
 """
 homeassistant.components.device_tracker.fritz
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Unfortunately, you have to execute the following command by hand:
+sudo apt-get install libxslt-dev libxml2-dev
+
 Device tracker platform that supports scanning a FitzBox router for device
 presence.
 
@@ -34,11 +37,11 @@ because the necessary data can be retrieved anonymously.
 """
 import logging
 from datetime import timedelta
+
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.helpers import validate_config
 from homeassistant.util import Throttle
 from homeassistant.components.device_tracker import DOMAIN
-
 
 # Return cached results if last scan was less then this time ago
 MIN_TIME_BETWEEN_SCANS = timedelta(seconds=5)
@@ -49,9 +52,9 @@ REQUIREMENTS = ['fritzconnection==0.4.6']
 
 
 def get_scanner(hass, config):
-    """ Validates config and returns FritzBoxScanner obj"""
+    """ Validates config and returns FritzBoxScanner"""
     if not validate_config(config,
-                           {DOMAIN: [CONF_HOST, CONF_USERNAME, CONF_PASSWORD]},
+                           {DOMAIN: []},
                            _LOGGER):
         return None
     scanner = FritzBoxScanner(config[DOMAIN])
