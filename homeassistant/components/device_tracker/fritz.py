@@ -21,19 +21,22 @@ device_tracker:
 host
 *Optional
 The IP address of your router, e.g. 192.168.0.1.
-It is optional since every fritzbox is also reachable by using the 169.254.1.1 IP.
+It is optional since every fritzbox is also reachable by using
+the 169.254.1.1 IP.
 
 username
 *Optional
 The username of an user with administrative privileges, usually 'admin'.
-However, it seems that it is not necessary to use it in current generation fritzbox routers
-because the necessary data can be retrieved anonymously.
+However, it seems that it is not necessary to use it in
+current generation fritzbox routers because the necessary data
+can be retrieved anonymously.
 
 password
 *Optional
 The password for your given admin account.
-However, it seems that it is not necessary to use it in current generation fritzbox routers
-because the necessary data can be retrieved anonymously.
+However, it seems that it is not necessary to use it in current
+generation fritzbox routers because the necessary data can
+be retrieved anonymously.
 """
 import logging
 from datetime import timedelta
@@ -48,7 +51,9 @@ MIN_TIME_BETWEEN_SCANS = timedelta(seconds=5)
 
 _LOGGER = logging.getLogger(__name__)
 
-#REQUIREMENTS = ['https://github.com/deisi/fritzconnection/archive/b5c14515e1c8e2652b06b6316a7f3913df942841.zip#fritzconnection==0.4.6']
+# REQUIREMENTS = ['https://github.com/deisi/fritzconnection
+# /archive/b5c14515e1c8e2652b06b6316a7f3913df942841.zip
+# #fritzconnection==0.4.6']
 
 
 # noinspection PyUnusedLocal
@@ -88,8 +93,9 @@ class FritzBoxScanner(object):
             # noinspection PyPackageRequirements,PyUnresolvedReferences
             import fritzconnection as fc
         except ImportError:
-            _LOGGER.exception("""Failed to import Python library fritzconnection.
-                              Please run <home-assistant>/setup to install it.""")
+            _LOGGER.exception("""Failed to import Python library
+                                fritzconnection. Please run
+                                <home-assistant>/setup to install it.""")
             self.success_init = False
             return
 
@@ -103,7 +109,9 @@ class FritzBoxScanner(object):
 
         # Establish a connection to the fritzbox
         try:
-            self.fritz_box = fc.FritzHosts(address=self.host, user=self.username, password=self.password)
+            self.fritz_box = fc.FritzHosts(address=self.host,
+                                           user=self.username,
+                                           password=self.password)
         except Exception:
             self.fritz_box = None
 
@@ -115,10 +123,12 @@ class FritzBoxScanner(object):
             self.success_init = True
 
         if self.success_init:
-            _LOGGER.info("Successfully connected to {0}".format(self.fritz_box.modelname))
+            _LOGGER.info("Successfully connected to {0}"
+                         .format(self.fritz_box.modelname))
             self._update_info()
         else:
-            _LOGGER.error("Failed to establish connection to FritzBox with IP: {0}".format(self.host))
+            _LOGGER.error("Failed to establish connection to FritzBox "
+                          "with IP: {0}".format(self.host))
 
     def scan_devices(self):
         """ Scan for new devices and return a list of found device ids. """
