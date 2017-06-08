@@ -279,6 +279,8 @@ class OsramLightifyGroup(Luminary):
         """Update group status."""
         super().update()
         self._light_ids = self._luminary.lights()
+        if not self._bridge.lights():
+            return
         light = self._bridge.lights()[self._light_ids[0]]
         self._brightness = int(light.lum() * 2.55)
         self._rgb = light.rgb()
